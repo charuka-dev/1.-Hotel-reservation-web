@@ -40,8 +40,10 @@
             font-size: 15px;
         }
         .glass-panel input[type="text"],
-        .glass-panel input[type="password"] {
+        .glass-panel input[type="password"],
+        .glass-panel select {
             width: 100%;
+            box-sizing: border-box; /* Ensure padding and border are included in width */
             padding: 10px 12px;
             margin-bottom: 18px;
             border: none;
@@ -76,6 +78,12 @@
     <div class="glass-panel">
         <h1>Login</h1>
         <form action="/login" method="post">
+            <label for="role">Role</label>
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Select role</option>
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+            </select>
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required>
             <label for="password">Password</label>
@@ -83,3 +91,5 @@
             <input type="submit" value="Login">
         </form>
     </div>
+</body>
+</html>

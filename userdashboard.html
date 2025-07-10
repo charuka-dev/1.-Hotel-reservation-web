@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            height: 100vh;
+        }
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding-top: 40px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+        }
+        .sidebar button {
+            background: none;
+            border: none;
+            color: #222;
+            font-size: 18px;
+            padding: 18px 24px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 0 24px 24px 0;
+            margin-bottom: 8px;
+        }
+        .sidebar button.active,
+        .sidebar button:hover {
+            background: rgba(255,255,255,0.25);
+            color: #007bff;
+        }
+        .main-panel {
+            flex: 1;
+            padding: 40px 0 0 0; /* Remove left/right padding */
+            background: #fff;
+            min-width: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-panel {
+            width: 100%;
+            background: linear-gradient(90deg, #74ebd5 0%, #ACB6E5 100%);
+            color: #222;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 18px 0; /* Remove left/right padding */
+            border-radius: 0 0 16px 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .content-panel {
+            flex: 1;
+            padding: 0 48px 40px 48px; /* Add horizontal padding only to content */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <button id="btnHome" class="active" onclick="loadPanel('home')">Home</button>
+            <button id="btnBrowse" onclick="loadPanel('browse')">Browse Foods</button>
+            <button id="btnOrders" onclick="loadPanel('orders')">Orders</button>
+            <button id="btnProfile" onclick="loadPanel('profile')">My Profile</button>
+            <button id="btnLogout" style="margin-top:auto; color:#0c0c0c;" onclick="logout()">Logout</button>
+        </div>
+        <div class="main-panel">
+            <div class="top-panel" id="topPanel">
+                Order Foods
+            </div>
+            <div class="content-panel" id="mainPanel">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+    <script>
+    // Panel content for each section
+    const panelContent = {
+        home: `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 24px; min-height: 350px;">
+            <!-- Panel 1: Online Users -->
+            <div style="background:linear-gradient(135deg,#74ebd5 0%,#ACB6E5 100%); color:#222; border-radius:16px; padding:28px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:160px;">
+                <div style="font-size:38px; font-weight:bold; margin-bottom:8px;">1000+</div>
+                <div style="font-size:18px;">Online Users</div>
+            </div>
+            <!-- Panel 2: Food Varieties -->
+            <div style="background:linear-gradient(135deg,#ACB6E5 0%,#74ebd5 100%); color:#222; border-radius:16px; padding:28px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:160px;">
+                <div style="font-size:38px; font-weight:bold; margin-bottom:8px;">500+</div>
+                <div style="font-size:18px;">Varieties of Foods</div>
+            </div>
+            <!-- Panel 3: Auto Changing Images -->
+            <div style="background:linear-gradient(135deg,#f8ffae 0%,#43c6ac 100%); color:#222; border-radius:16px; padding:18px 8px 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:160px;">
+                <div id="foodSlider" style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;">
+                    <img id="sliderImg" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=80" alt="Food" style="width:90px;height:90px;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:#eee;">
+                </div>
+                <div style="font-size:18px; margin-top:10px;">Popular Foods</div>
+            </div>
+            <!-- Panel 4: Chefs -->
+            <div style="background:linear-gradient(135deg,#f7971e 0%,#ffd200 100%); color:#222; border-radius:16px; padding:28px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:160px;">
+                <div style="font-size:38px; font-weight:bold; margin-bottom:8px;">5+</div>
+                <div style="font-size:18px;">Experienced Chefs</div>
+            </div>
+        </div>
+        <div style="margin-top:32px; background:#fff; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); padding:24px;">
+            <h3 style="margin:0 0 16px 0; color:#007bff;">Restaurant Rating Trend</h3>
+            <canvas id="ratingChart" height="80"></canvas>
+        </div>
+        `,
+        browse: `
+    <h2>Browse Foods</h2>
+    <table id="foodsTable" style="width:100%; border-collapse:collapse; margin-top:24px;">
+        <thead>
+            <tr style="background:#f0f2f5;">
+                <th style="padding:8px; border-radius:8px 0 0 8px; text-align:center;">Image</th>
+                <th style="padding:8px; text-align:center;">Name</th>
+                <th style="padding:8px; text-align:center;">Category</th>
+                <th style="padding:8px; text-align:center;">Price</th>
+                <th style="padding:8px; text-align:center;">Status</th>
+                <th style="padding:8px; border-radius:0 8px 8px 0; text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="foodsTableBody">
+            <tr><td colspan="6" style="text-align:center; padding:24px;">Loading...</td></tr>
+        </tbody>
+    </table>
+`,
+        orders: `
+    <h2>Your Orders</h2>
+    <table id="ordersTable" style="width:100%; border-collapse:collapse; margin-top:24px;">
+        <thead>
+            <tr style="background:#f0f2f5;">
+                <th style="padding:8px; border-radius:8px 0 0 8px; text-align:center;">Image</th>
+                <th style="padding:8px; text-align:center;">Name</th>
+                <th style="padding:8px; text-align:center;">Price</th>
+                <th style="padding:8px; text-align:center;">Quantity</th>
+                <th style="padding:8px; text-align:center;">Total Price</th>
+                <th style="padding:8px; border-radius:0 8px 8px 0; text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+            <tr><td colspan="6" style="text-align:center; padding:24px;">Loading...</td></tr>
+        </tbody>
+    </table>
+`,
+        profile: `<h2>My Profile</h2>
+                  <p>Manage your profile information and settings.</p>`
+    };
+
+    // Panel titles for the top panel
+    const panelTitles = {
+        home: "Home",
+        browse: "Browse Foods",
+        orders: "Your Orders",
+        profile: "My Profile"
+    };
+
+    // Function to load content dynamically
+    function loadPanel(panel) {
+        document.getElementById('mainPanel').innerHTML = panelContent[panel];
+        document.getElementById('topPanel').textContent = panelTitles[panel];
+        // Set active button
+        document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+        if(panel === 'home') document.getElementById('btnHome').classList.add('active');
+        if(panel === 'browse') document.getElementById('btnBrowse').classList.add('active');
+        if(panel === 'orders') document.getElementById('btnOrders').classList.add('active');
+        if(panel === 'profile') document.getElementById('btnProfile').classList.add('active');
+        // Start slider if home panel
+        if(panel === 'home') {
+            startSlider();
+            setTimeout(drawRatingChart, 100);
+        }
+        // Load foods if browse panel
+        if(panel === 'browse') {
+            fetchFoods();
+        }
+        // Load orders if orders panel
+        if(panel === 'orders') {
+            fetchOrders();
+             fetchRawOrders();
+        }
+    }
+
+    // Food images for slider
+    const sliderImages = [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=80",
+        "https://cheapandcheerfulcooking.com/wp-content/uploads/2023/02/vegan-kottu-roti-4.jpg",
+        "https://www.hungrylankan.com/wp-content/uploads/2024/07/IMG_4940.jpeg",
+        "https://www.theflavorbender.com/wp-content/uploads/2018/03/Chicken-Kottu-Roti-The-Flavor-Bender-Featured-Image-SQ-8.jpg",
+        "https://www.tasteatlas.com/images/dishes/a7c96da4df74439f92e41ee94c6885d2.jpg"
+    ];
+    let sliderIndex = 0;
+    let sliderInterval = null;
+
+    function startSlider() {
+        clearInterval(sliderInterval);
+        const img = document.getElementById('sliderImg');
+        if (!img) return;
+        img.src = sliderImages[sliderIndex];
+        sliderInterval = setInterval(() => {
+            sliderIndex = (sliderIndex + 1) % sliderImages.length;
+            img.src = sliderImages[sliderIndex];
+        }, 10000); // 30 seconds
+    }
+
+    // Draw line graph for restaurant rating
+    function drawRatingChart() {
+        const ctx = document.getElementById('ratingChart');
+        if (!ctx) return;
+        // Example: ratings increase over time
+        const data = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Rating',
+                data: [3.2, 3.5, 3.8, 4.0, 4.2, 4.5, 4.8],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.08)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#007bff'
+            }]
+        };
+        new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        min: 3,
+                        max: 5,
+                        ticks: { stepSize: 0.2 }
+                    }
+                }
+            }
+        });
+    }
+
+    // Browse panel: Fetch foods from server (AJAX)
+    function fetchFoods() {
+        fetch('fetch_foods.php')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('foodsTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px;">No foods found.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = data.map(row => `
+    <tr>
+        <td style="padding:8px; text-align:center;">
+            <img src="${row.image}" alt="${row.name}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+        </td>
+        <td style="padding:8px; text-align:center;">${row.name}</td>
+        <td style="padding:8px; text-align:center;">${row.category}</td>
+        <td style="padding:8px; text-align:center;">${row.price}</td>
+        <td style="padding:8px; text-align:center;">${row.status}</td>
+        <td style="padding:8px; text-align:center;">
+            <button onclick="buyNow(${row.id})" style="padding:6px 16px; background:#007bff; color:#fff; border:none; border-radius:6px; cursor:pointer;">Buy Now</button>
+        </td>
+    </tr>
+`).join('');
+            })
+            .catch(() => {
+                document.getElementById('foodsTableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px;">Error loading foods.</td></tr>`;
+            });
+    }
+
+    // Buy Now: Insert order (AJAX)
+    function buyNow(foodId) {
+        // You should replace this with the actual logged-in user ID from your session
+        const userId = window.loggedInUserId || 1; // Example fallback
+        fetch('create_order.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, foodId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert('Order placed successfully!');
+            } else {
+                alert('Order failed: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(() => alert('Order failed: Network error'));
+    }
+
+    panelContent.orders = `
+    <h2>Your Orders</h2>
+    <table id="ordersTable" style="width:100%; border-collapse:collapse; margin-top:24px;">
+        <thead>
+            <tr style="background:#f0f2f5;">
+                <th style="padding:8px; border-radius:8px 0 0 8px; text-align:center;">Image</th>
+                <th style="padding:8px; text-align:center;">Name</th>
+                <th style="padding:8px; text-align:center;">Price</th>
+                <th style="padding:8px; text-align:center;">Quantity</th>
+                <th style="padding:8px; text-align:center;">Total Price</th>
+                <th style="padding:8px; border-radius:0 8px 8px 0; text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+            <tr><td colspan="6" style="text-align:center; padding:24px;">Loading...</td></tr>
+        </tbody>
+    </table>
+`;
+
+    // Fetch orders and food info
+    function fetchOrders() {
+        // You should replace this with the actual logged-in user ID from your session
+        const userId = window.loggedInUserId || 1; // Example fallback
+        fetch('fetch_orders.php?userId=' + userId)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('ordersTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px;">No orders found.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = data.map((row, idx) => `
+                    <tr>
+                        <td style="padding:8px; text-align:center;">
+                            <img src="${row.image}" alt="${row.name}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+                        </td>
+                        <td style="padding:8px; text-align:center;">${row.name}</td>
+                        <td style="padding:8px; text-align:center;" id="price-${idx}">${row.price}</td>
+                        <td style="padding:8px; text-align:center;">
+                            <input type="number" min="1" value="1" id="qty-${idx}" style="width:60px; text-align:center;">
+                        </td>
+                        <td style="padding:8px; text-align:center;" id="total-${idx}">${row.price}</td>
+                        <td style="padding:8px; text-align:center;">
+                            <button onclick="calculateTotal(${idx})" style="padding:4px 10px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-right:6px;">Calculate</button>
+                            <button onclick="confirmOrder(${row.orderId}, ${idx})" style="padding:4px 10px; background:#007bff; color:#fff; border:none; border-radius:6px; cursor:pointer;">Confirm</button>
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(() => {
+                document.getElementById('ordersTableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px;">Error loading orders.</td></tr>`;
+            });
+    }
+    function fetchRawOrders() {
+    fetch('fetch_raw_orders.php') // Create this PHP file to return full order data
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('rawOrdersTableBody');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px;">No raw order records found.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(row => `
+                <tr>
+                    <td style="padding:8px;">${row.id}</td>
+                    <td style="padding:8px;">${row.userId}</td>
+                    <td style="padding:8px;">${row.foodId}</td>
+                    <td style="padding:8px;">${row.totalPrice}</td>
+                    <td style="padding:8px;">${row.status}</td>
+                    <td style="padding:8px;">${row.orderTime}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(() => {
+            document.getElementById('rawOrdersTableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px;">Error loading raw order data.</td></tr>`;
+        });
+}
+
+    // Calculate total price
+    function calculateTotal(idx) {
+        const qty = parseInt(document.getElementById('qty-' + idx).value) || 1;
+        const price = parseFloat(document.getElementById('price-' + idx).textContent) || 0;
+        document.getElementById('total-' + idx).textContent = (qty * price).toFixed(2);
+    }
+
+    // Confirm order: update totalPrice in orders table
+    function confirmOrder(orderId, idx) {
+        const qty = parseInt(document.getElementById('qty-' + idx).value) || 1;
+        const price = parseFloat(document.getElementById('price-' + idx).textContent) || 0;
+        const totalPrice = qty * price;
+        fetch('update_order_total.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, totalPrice })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert('Order confirmed!');
+            } else {
+                alert('Failed to confirm order: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(() => alert('Failed to confirm order: Network error'));
+    }
+
+    function logout() {
+        window.location.href = 'login.html';
+    }
+
+    // Load home panel by default on page load
+    window.onload = function() {
+        loadPanel('home');
+    };
+</script>
+</body>
+</html>

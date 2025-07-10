@@ -1,25 +1,27 @@
 <?php
 // fetch_raw_orders.php
+header('Content-Type: application/json');
 
-include 'db_connection.php'; // your DB connection script
+// Database connection
+$conn = new mysqli("localhost", "root", "", "foodordering");
 
-$sql = "SELECT id, userId, foodId, totalPrice, status, orderTime FROM orders ORDER BY orderTime DESC";
-
-$result = $conn->query($sql);
-
-$userId = $_GET['userId'] ?? null;
-
-if (!$userId) {
+// Check connection
+if ($conn->connect_error) {
     echo json_encode([]);
     exit;
 }
 
-$sql = "SELECT id, userId, foodId, totalPrice, status, orderTime FROM orders WHERE userId = ? ORDER BY orderTime DESC";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
+// SQL query to get all raw orders data
+$sql = "SELECT id, userId, foodId, totalPrice, status, orderTime FROM orders ORDER BY orderTime DESC";
+$result = $conn->query($sql);
 
-header('Content-Type: application/json');
+$orders = [];
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $orders[] = $row;
+    }
+}
+
 echo json_encode($orders);
+$conn->close();
 ?>

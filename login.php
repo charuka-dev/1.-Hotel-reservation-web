@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     try {
-        if ($role === 'customer') {
+        if ($role === 'Customer') {
             // Check user table for customer login
-            $stmt = $conn->prepare("SELECT id, username, password FROM user WHERE username = ?");
+            $stmt = $conn->prepare("SELECT id, userName, password FROM user WHERE userName = ?");
             $stmt->execute([$username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -32,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
             
-        } else if ($role === 'admin') {
+        } else if ($role === 'Admin') {
             // Check admin table for admin login
-            $stmt = $conn->prepare("SELECT id, name, password FROM admin WHERE name = ?");
+            $stmt = $conn->prepare("SELECT id, userName, password FROM admin WHERE userName = ?");
             $stmt->execute([$username]);
             $admin = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Login successful - set session and redirect to userdashboard.html
                 $_SESSION['user_id'] = $admin['id'];
                 $_SESSION['username'] = $admin['name'];
-                $_SESSION['role'] = 'admin';
+                $_SESSION['role'] = 'Admin';
                 header("Location: userdashboard.html");
                 exit();
             } else {

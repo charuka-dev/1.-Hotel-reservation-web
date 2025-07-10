@@ -156,8 +156,39 @@
         </tbody>
     </table>
 `,
-        profile: `<h2>My Profile</h2>
-                  <p>Manage your profile information and settings.</p>`
+        profile: `
+    <h2>My Profile</h2>
+    <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <form id="profileForm" style="display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center;">
+            <label style="font-weight: bold; color: #333;">User ID:</label>
+            <input type="text" id="userId" readonly style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa;">
+            
+            <label style="font-weight: bold; color: #333;">Username:</label>
+            <input type="text" id="username" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            
+            <label style="font-weight: bold; color: #333;">Password:</label>
+            <input type="password" id="password" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            
+            <label style="font-weight: bold; color: #333;">Address:</label>
+            <textarea id="address" rows="3" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
+            
+            <label style="font-weight: bold; color: #333;">Phone:</label>
+            <input type="tel" id="phone" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            
+            <label style="font-weight: bold; color: #333;">Email:</label>
+            <input type="email" id="email" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            
+            <div style="grid-column: span 2; display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button type="button" onclick="updateProfile()" style="padding: 12px 30px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.2s;">
+                    Update Profile
+                </button>
+                <button type="button" onclick="deleteProfile()" style="padding: 12px 30px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.2s;">
+                    Delete Account
+                </button>
+            </div>
+        </form>
+    </div>
+`
     };
 
     // Panel titles for the top panel
@@ -191,6 +222,10 @@
         if(panel === 'orders') {
             fetchOrders();
              fetchRawOrders();
+        }
+        // Load user profile if profile panel
+        if(panel === 'profile') {
+            fetchUserProfile();
         }
     }
 
@@ -424,6 +459,88 @@
             }
         })
         .catch(() => alert('Failed to confirm order: Network error'));
+    }
+
+    // Fetch user profile data
+    function fetchUserProfile() {
+        const userId = window.loggedInUserId || 1; // Example fallback
+        fetch('fetch_user.php?userId=' + userId)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.id) {
+                    document.getElementById('userId').value = data.id;
+                    document.getElementById('username').value = data.username || '';
+                    document.getElementById('password').value = data.password || '';
+                    document.getElementById('address').value = data.address || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    document.getElementById('email').value = data.email || '';
+                } else {
+                    alert('Failed to load profile data');
+                }
+            })
+            .catch(() => alert('Error loading profile data'));
+    }
+
+    // Update user profile
+    function updateProfile() {
+        const userId = document.getElementById('userId').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const address = document.getElementById('address').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
+
+        if (!username || !password || !email) {
+            alert('Username, password, and email are required');
+            return;
+        }
+
+        fetch('update_user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: userId,
+                username: username,
+                password: password,
+                address: address,
+                phone: phone,
+                email: email
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Profile updated successfully!');
+            } else {
+                alert('Failed to update profile: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(() => alert('Error updating profile'));
+    }
+
+    // Delete user account
+    function deleteProfile() {
+        if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            return;
+        }
+
+        const userId = document.getElementById('userId').value;
+        
+        fetch('delete_user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Account deleted successfully!');
+                logout();
+            } else {
+                alert('Failed to delete account: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(() => alert('Error deleting account'));
     }
 
     function logout() {

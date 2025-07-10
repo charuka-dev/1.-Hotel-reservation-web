@@ -384,12 +384,12 @@
             }
             tbody.innerHTML = data.map(row => `
                 <tr>
-                    <td style="padding:8px;">${row.id}</td>
-                    <td style="padding:8px;">${row.userId}</td>
-                    <td style="padding:8px;">${row.foodId}</td>
-                    <td style="padding:8px;">${row.totalPrice}</td>
-                    <td style="padding:8px;">${row.status}</td>
-                    <td style="padding:8px;">${row.orderTime}</td>
+                    <td style="padding:8px; text-align:center;">${row.id}</td>
+                    <td style="padding:8px; text-align:center;">${row.userId}</td>
+                    <td style="padding:8px; text-align:center;">${row.foodId}</td>
+                    <td style="padding:8px; text-align:center;">${row.totalPrice}</td>
+                    <td style="padding:8px; text-align:center;">${row.status}</td>
+                    <td style="padding:8px; text-align:center;">${row.orderTime}</td>
                 </tr>
             `).join('');
         })

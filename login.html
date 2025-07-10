@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Hotel Reservation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 40px 32px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .glass-panel h1 {
+            margin-bottom: 24px;
+            color: #222;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .glass-panel label {
+            align-self: flex-start;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 15px;
+        }
+        .glass-panel input[type="text"],
+        .glass-panel input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.7);
+            font-size: 16px;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+        .glass-panel input[type="text"]:focus,
+        .glass-panel input[type="password"]:focus {
+            box-shadow: 0 0 0 2px #74ebd5;
+        }
+        .glass-panel input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #74ebd5 0%, #ACB6E5 100%);
+            color: #222;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .glass-panel input[type="submit"]:hover {
+            background: linear-gradient(90deg, #ACB6E5 0%, #74ebd5 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-panel">
+        <h1>Login</h1>
+        <form action="/login" method="post">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Login">
+        </form>
+    </div>
